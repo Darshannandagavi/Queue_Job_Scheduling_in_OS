@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FlowPrint RR | Round Robin Print Queue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0eef7 0%, #e6e2f0 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .navbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0 0 1rem 0;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            padding: 0.55rem 0.95rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            border: 1px solid rgba(95,74,142,0.18);
+            color: #4a3a6e;
+            background: rgba(255,255,255,0.75);
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-1px);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .nav-link.active {
+            background: #5f4a8e;
+            color: white;
+            border-color: #5f4a8e;
+        }
+
+        /* main container */
+        .app-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            padding: 1.8rem 2rem 2.2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.6);
+            transition: all 0.2s;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3a2f5f, #5f4a8e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.25rem;
+        }
+
+        h2::before {
+            content: "🔄";
+            font-size: 2rem;
+            background: none;
+            -webkit-background-clip: unset;
+            color: #5f4a8e;
+        }
+
+        /* quantum meta card */
+        .quantum-card {
+            background: linear-gradient(105deg, #f3efff 0%, #ebe6fc 100%);
+            border-radius: 1.2rem;
+            padding: 0.6rem 1.2rem;
+            margin: 0.5rem 0 0.8rem 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid rgba(95,74,142,0.15);
+        }
+        .quantum-card::before {
+            content: "⏱️";
+            font-size: 1.1rem;
+        }
+        #meta {
+            font-weight: 600;
+            color: #4a3a6e;
+            font-size: 0.85rem;
+            letter-spacing: 0.2px;
+        }
+
+        /* overall progress */
+        .progress-card {
+            background: rgba(255,255,255,0.85);
+            border-radius: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.75rem 0 1.25rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            backdrop-filter: blur(4px);
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            color: #4a3a6e;
+        }
+        .progress-header span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .progress-header span:first-child::before {
+            content: "📊";
+            font-size: 1.1rem;
+        }
+        #overallText {
+            background: #5f4a8e20;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .progress-bar-bg {
+            height: 12px;
+            background: #e9e5f0;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        #overallBar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7b5ea7, #9b7bcb);
+            border-radius: 999px;
+            transition: width 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: relative;
+            overflow: hidden;
+        }
+        #overallBar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+            animation: shimmer 1.8s infinite;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* message toast */
+        .msg-toast {
+            background: #5f4a8e;
+            color: #f7f3ff;
+            padding: 0.85rem 1.5rem;
+            border-radius: 60px;
+            margin: 0.5rem 0 1.2rem 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-block;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            animation: fadeSlideIn 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes fadeSlideIn {
+            0% { opacity: 0; transform: translateY(-12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* input panel */
+        .input-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 1.2rem 0 1.8rem 0;
+            background: rgba(255,255,255,0.75);
+            padding: 1.2rem 1.5rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02), inset 0 1px 0 white;
+        }
+
+        .input-panel input, .input-panel button {
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            padding: 0.8rem 1.2rem;
+            border-radius: 2rem;
+            transition: all 0.2s;
+        }
+
+        .input-panel input {
+            flex: 1;
+            min-width: 140px;
+            background: white;
+            border: 1px solid #ddd6f0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .input-panel input:focus {
+            border-color: #7b5ea7;
+            box-shadow: 0 0 0 3px rgba(123,94,167,0.2);
+            transform: scale(1.01);
+        }
+
+        .input-panel button {
+            background: #5f4a8e;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 12px -6px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .input-panel button:hover {
+            background: #493a6b;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 18px -8px rgba(0,0,0,0.25);
+        }
+
+        .input-panel button:active {
+            transform: translateY(1px);
+        }
+
+        /* grid */
+        .grid {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .col {
+            flex: 1;
+            min-width: 340px;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(2px);
+            border-radius: 1.8rem;
+            padding: 0.2rem 0 1rem 0;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1);
+        }
+
+        .col h3 {
+            margin: 1rem 0 0.6rem 1.2rem;
+            font-weight: 600;
+            font-size: 1.45rem;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .col:first-child h3::before {
+            content: "⏳";
+            font-size: 1.5rem;
+        }
+        .col:last-child h3::before {
+            content: "✅";
+            font-size: 1.5rem;
+        }
+
+        /* table */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 0 0.8rem 1rem 0.8rem;
+            border-radius: 1.2rem;
+            background: rgba(255,255,255,0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 10px;
+            background: #f2effa;
+            color: #4a3a6e;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #dad2f0;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #ece7f5;
+            background-color: white;
+            transition: background 0.2s;
+            color: #2d2a3a;
+        }
+
+        tr:hover td {
+            background-color: #f8f5ff;
+        }
+
+        /* progress inside cell */
+        .progress-cell {
+            min-width: 110px;
+        }
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .progress-track {
+            flex: 1;
+            height: 8px;
+            background: #e8e3f5;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #7b5ea7, #9f81cf);
+            border-radius: 999px;
+            transition: width 0.35s ease-out;
+        }
+        .progress-percent {
+            min-width: 42px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #5f4a8e;
+        }
+
+        /* animations for rows */
+        @keyframes gentlePop {
+            0% { background-color: #f2eaff; transform: scale(0.98); }
+            60% { background-color: #faf5ff; }
+            100% { background-color: white; }
+        }
+
+        @keyframes completeGlow {
+            0% { background-color: #e6d9ff; box-shadow: inset 0 0 0 2px #b89eff; }
+            100% { background-color: white; }
+        }
+
+        .queue-animate {
+            animation: gentlePop 0.45s ease-out;
+        }
+        .complete-animate {
+            animation: completeGlow 0.55s ease-out;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        .status-pending { color: #b86f2c; }
+        .status-completed { color: #5f8a6e; }
+        .status-running { color: #5f4a8e; }
+
+        @media (max-width: 800px) {
+            body { padding: 1rem; }
+            .app-container { padding: 1rem; }
+            .input-panel { flex-direction: column; }
+            .input-panel input, .input-panel button { width: 100%; }
+            th, td { font-size: 0.7rem; padding: 8px 6px; }
+            .progress-wrapper { gap: 4px; }
+            .progress-percent { min-width: 36px; font-size: 0.7rem; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e9e4f5;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b39fdf;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <nav class="navbar">
+        <a class="nav-link" href="/fifo">FIFO</a>
+        <a class="nav-link" href="/priority">Priority</a>
+        <a class="nav-link" href="/sjf">SJF</a>
+        <a class="nav-link" href="/ljf">LJF</a>
+        <a class="nav-link active" href="/roundrobin">Round Robin</a>
+    </nav>
+    <h2>Round Robin Print System</h2>
+    
+    <!-- Quantum info card -->
+    <div class="quantum-card">
+        <span id="meta">Time quantum: -- s</span>
+    </div>
+
+    <!-- Overall progress card -->
+    <div class="progress-card">
+        <div class="progress-header">
+            <span>Overall Completion</span>
+            <span id="overallText">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div id="overallBar" style="width:0%"></div>
+        </div>
+    </div>
+
+    <div id="msg" class="msg-toast" style="display: none;"></div>
+
+    <div class="input-panel">
+        <input type="text" id="emp" placeholder="Employee name 👤" autocomplete="off">
+        <input type="text" id="doc" placeholder="Document name 📄" autocomplete="off">
+        <input type="number" id="pages" placeholder="Pages 📑" value="1" min="1">
+        <button id="addBtn">➕ Add Round Robin Job</button>
+    </div>
+
+    <div class="grid">
+        <div class="col">
+            <h3>Queue (Round Robin)</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Employee</th><th>File</th><th>Pages</th><th>Time</th><th>Status</th><th>Progress</th></tr>
+                    </thead>
+                    <tbody id="queueBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col">
+            <h3>Completed Jobs</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Employee</th><th>File</th><th>Pages</th><th>Time</th><th>Status</th><th>Progress</th></tr>
+                    </thead>
+                    <tbody id="completedBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM elements
+    const empInput = document.getElementById("emp");
+    const docInput = document.getElementById("doc");
+    const pagesInput = document.getElementById("pages");
+    const msgDiv = document.getElementById("msg");
+    const metaSpan = document.getElementById("meta");
+    const queueBody = document.getElementById("queueBody");
+    const completedBody = document.getElementById("completedBody");
+    const addButton = document.getElementById("addBtn");
+    const overallTextSpan = document.getElementById("overallText");
+    const overallBarDiv = document.getElementById("overallBar");
+
+    let initialized = false;
+    let seenCompletedIds = new Set();      // track completed IDs for toast
+
+    // Helper: show animated toast
+    function showMessage(text, isError = false) {
+        msgDiv.textContent = text;
+        msgDiv.style.display = "inline-block";
+        msgDiv.style.backgroundColor = isError ? "#aa6f4e" : "#5f4a8e";
+        msgDiv.style.color = "white";
+        msgDiv.style.animation = "none";
+        void msgDiv.offsetWidth;
+        msgDiv.style.animation = "fadeSlideIn 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1)";
+        setTimeout(() => {
+            if (msgDiv.textContent === text) {
+                msgDiv.style.opacity = "0";
+                setTimeout(() => {
+                    if (msgDiv.textContent === text) {
+                        msgDiv.style.display = "none";
+                        msgDiv.style.opacity = "1";
+                    }
+                }, 200);
+            }
+        }, 3200);
+    }
+
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Format timestamp
+    function formatTime(ts) {
+        if (!ts) return "—";
+        const date = new Date(ts * 1000);
+        return date.toLocaleString([], { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true });
+    }
+
+    // Build row HTML with progress bar
+    function buildRowHtml(job) {
+        const progressPercent = Math.max(0, Math.min(100, parseInt(job.progress_percent || 0, 10)));
+        let statusText = "";
+        let statusClass = "";
+        if (job.status === "pending") {
+            statusText = "⏳ Pending";
+            statusClass = "status-pending";
+        } else if (job.status === "running") {
+            statusText = "🔄 Running (RR)";
+            statusClass = "status-running";
+        } else {
+            statusText = "✔️ Completed";
+            statusClass = "status-completed";
+        }
+        
+        return `
+            <tr data-job-id="${job.job_id}" data-status="${job.status}">
+                <td style="font-weight:500;">${job.job_id}</td>
+                <td>${escapeHtml(job.employee) || "—"}</td>
+                <td>${escapeHtml(job.document) || "—"}</td>
+                <td>${job.pages}</td>
+                <td>${formatTime(job.timestamp)}</td>
+                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                <td class="progress-cell">
+                    <div class="progress-wrapper">
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                        </div>
+                        <div class="progress-percent">${progressPercent}%</div>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    // Animation helpers
+    function animateNewQueueRows(oldQueueIdsSet, newQueueJobs, container) {
+        if (!container) return;
+        const newIds = new Set(newQueueJobs.map(j => j.job_id));
+        const addedIds = [...newIds].filter(id => !oldQueueIdsSet.has(id));
+        if (addedIds.length === 0) return;
+        
+        const rows = container.querySelectorAll('tr');
+        rows.forEach(row => {
+            const rowId = parseInt(row.getAttribute('data-job-id'));
+            if (addedIds.includes(rowId)) {
+                row.classList.add('queue-animate');
+                row.addEventListener('animationend', () => row.classList.remove('queue-animate'), { once: true });
+            }
+        });
+    }
+
+    function animateNewCompletedRows(oldCompletedSet, newCompletedJobs, container) {
+        if (!container) return;
+        const newIdsSet = new Set(newCompletedJobs.map(j => j.job_id));
+        const addedIds = [...newIdsSet].filter(id => !oldCompletedSet.has(id));
+        if (addedIds.length === 0) return;
+        
+        const rows = container.querySelectorAll('tr');
+        rows.forEach(row => {
+            const rowId = parseInt(row.getAttribute('data-job-id'));
+            if (addedIds.includes(rowId)) {
+                row.classList.add('complete-animate');
+                row.addEventListener('animationend', () => row.classList.remove('complete-animate'), { once: true });
+            }
+        });
+    }
+
+    // Update overall progress bar
+    function updateOverallProgress(percent) {
+        const pct = Math.max(0, Math.min(100, parseInt(percent || 0, 10)));
+        overallTextSpan.textContent = `${pct}%`;
+        overallBarDiv.style.width = `${pct}%`;
+    }
+
+    // Main fetch & render
+    function loadJobs() {
+        fetch("/roundrobin-jobs")
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                const queueJobs = data.queue || [];
+                const completedJobs = data.completed || [];
+                const overall = data.overall || { percent: 0 };
+                
+                // Update overall progress
+                updateOverallProgress(overall.percent);
+                
+                // Update quantum display if present
+                if (data.quantum_seconds) {
+                    metaSpan.textContent = `Time quantum: ${data.quantum_seconds}s ⚡`;
+                } else if (data.quantum_ms) {
+                    metaSpan.textContent = `Time quantum: ${data.quantum_ms}ms`;
+                } else {
+                    metaSpan.textContent = `Round Robin active | fair scheduling`;
+                }
+                
+                // Capture current queue IDs before rerender for animation
+                const oldQueueIds = new Set();
+                if (queueBody.children.length > 0) {
+                    const currentRows = queueBody.querySelectorAll('tr');
+                    currentRows.forEach(row => {
+                        const idAttr = row.getAttribute('data-job-id');
+                        if (idAttr) oldQueueIds.add(parseInt(idAttr));
+                    });
+                }
+                
+                const oldCompletedSnapshot = new Set(seenCompletedIds);
+                
+                // Re-render tables
+                queueBody.innerHTML = queueJobs.map(job => buildRowHtml(job)).join("");
+                completedBody.innerHTML = completedJobs.map(job => buildRowHtml(job)).join("");
+                
+                // Animate new queue rows
+                animateNewQueueRows(oldQueueIds, queueJobs, queueBody);
+                // Animate new completed rows
+                animateNewCompletedRows(oldCompletedSnapshot, completedJobs, completedBody);
+                
+                // Toast for freshly completed jobs
+                if (initialized) {
+                    const currentCompletedIds = new Set(completedJobs.map(j => j.job_id));
+                    const freshlyCompleted = [...currentCompletedIds].filter(id => !oldCompletedSnapshot.has(id));
+                    if (freshlyCompleted.length > 0) {
+                        freshlyCompleted.forEach(jobId => {
+                            const jobDetail = completedJobs.find(j => j.job_id === jobId);
+                            if (jobDetail) {
+                                showMessage(`🎉 Job #${jobDetail.job_id} (“${escapeHtml(jobDetail.document)}”) completed! (Round Robin)`, false);
+                            } else {
+                                showMessage(`✅ Print job #${jobId} finished successfully.`, false);
+                            }
+                        });
+                    }
+                }
+                
+                // Update seen completed set
+                seenCompletedIds.clear();
+                completedJobs.forEach(j => seenCompletedIds.add(j.job_id));
+                
+                if (!initialized) {
+                    initialized = true;
+                }
+            })
+            .catch(err => {
+                console.warn("Round Robin fetch error:", err);
+                if (!initialized) {
+                    msgDiv.textContent = "⚠️ Waiting for RR backend on /roundrobin-jobs ...";
+                    msgDiv.style.display = "block";
+                    msgDiv.style.backgroundColor = "#aa7a5e";
+                }
+            });
+    }
+    
+    // Add job via POST to /add-roundrobin
+    function addJob() {
+        const employee = empInput.value.trim();
+        const documentName = docInput.value.trim();
+        let pagesVal = parseInt(pagesInput.value, 10);
+        
+        if (!employee) {
+            showMessage("❌ Please enter employee name", true);
+            return;
+        }
+        if (!documentName) {
+            showMessage("❌ Please enter document name", true);
+            return;
+        }
+        if (isNaN(pagesVal) || pagesVal < 1) {
+            showMessage("❌ Pages must be at least 1", true);
+            pagesInput.value = 1;
+            return;
+        }
+        
+        const payload = {
+            employee: employee,
+            document: documentName,
+            pages: pagesVal
+        };
+        
+        fetch("/add-roundrobin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const errText = await response.text().catch(() => "");
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.json().catch(() => ({}));
+        })
+        .then(() => {
+            showMessage(`📄 Round Robin job added for ${employee} - "${documentName}" (${pagesVal} pages)`, false);
+            empInput.value = "";
+            docInput.value = "";
+            pagesInput.value = "1";
+            empInput.focus();
+            loadJobs(); // immediate refresh
+        })
+        .catch(error => {
+            console.error("Add Round Robin job error:", error);
+            showMessage(`⚠️ Failed to add job: ${error.message}`, true);
+        });
+    }
+    
+    // Event listeners
+    addButton.addEventListener("click", addJob);
+    [empInput, docInput, pagesInput].forEach(inp => {
+        inp.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                addJob();
+            }
+        });
+    });
+    
+    // Poll every 2 seconds
+    let interval = setInterval(loadJobs, 2000);
+    loadJobs();
+    
+    window.addEventListener("beforeunload", () => {
+        if (interval) clearInterval(interval);
+    });
+</script>
+</body>
+</html>

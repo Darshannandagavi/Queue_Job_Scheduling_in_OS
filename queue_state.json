@@ -1,0 +1,322 @@
+{
+  "job_id": 25,
+  "fifo": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 1,
+        "employee": "darshan",
+        "document": "app.py",
+        "pages": 5,
+        "remaining_pages": 5.0,
+        "priority": 2,
+        "timestamp": 1776872039.2047393,
+        "started_at": null,
+        "completed_at": null,
+        "status": "Completed"
+      },
+      {
+        "job_id": 2,
+        "employee": "sandes",
+        "document": "app.html",
+        "pages": 4,
+        "remaining_pages": 4.0,
+        "priority": 2,
+        "timestamp": 1776872322.4842417,
+        "started_at": null,
+        "completed_at": null,
+        "status": "Completed"
+      },
+      {
+        "job_id": 3,
+        "employee": "pavan",
+        "document": "fifo.html",
+        "pages": 10,
+        "remaining_pages": 10.0,
+        "priority": 2,
+        "timestamp": 1776872509.5944147,
+        "started_at": null,
+        "completed_at": null,
+        "status": "Completed"
+      },
+      {
+        "job_id": 11,
+        "employee": "darshan",
+        "document": "files.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873808.5040603,
+        "started_at": 1776873809.4212794,
+        "completed_at": 1776873819.423638,
+        "status": "Completed"
+      }
+    ],
+    "in_progress": null
+  },
+  "priority": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 18,
+        "employee": "shekhar",
+        "document": "app.py",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776875003.5403214,
+        "started_at": 1776875005.4238584,
+        "completed_at": 1776875015.4268403,
+        "status": "Completed"
+      },
+      {
+        "job_id": 19,
+        "employee": "sandesh",
+        "document": "app.hmtl",
+        "pages": 50,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776875035.354395,
+        "started_at": 1776875035.4318914,
+        "completed_at": 1776875085.4345891,
+        "status": "Completed"
+      },
+      {
+        "job_id": 20,
+        "employee": "pavan",
+        "document": "file.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 1,
+        "timestamp": 1776875054.8528035,
+        "started_at": 1776875085.4376588,
+        "completed_at": 1776875095.440058,
+        "status": "Completed"
+      },
+      {
+        "job_id": 21,
+        "employee": "ghjk",
+        "document": "hjk",
+        "pages": 8,
+        "remaining_pages": 0.0,
+        "priority": 3,
+        "timestamp": 1776875065.82853,
+        "started_at": 1776875095.4423535,
+        "completed_at": 1776875103.4454756,
+        "status": "Completed"
+      }
+    ],
+    "in_progress": null
+  },
+  "sjf": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 12,
+        "employee": "darshan",
+        "document": "files.txt",
+        "pages": 20,
+        "remaining_pages": 0.0,
+        "priority": 20,
+        "timestamp": 1776873857.5277088,
+        "started_at": 1776873859.4318473,
+        "completed_at": 1776873879.4344869,
+        "status": "Completed"
+      },
+      {
+        "job_id": 13,
+        "employee": "darshan",
+        "document": "files.json",
+        "pages": 11,
+        "remaining_pages": 0.0,
+        "priority": 11,
+        "timestamp": 1776873871.0703168,
+        "started_at": 1776873879.4369047,
+        "completed_at": 1776873890.4398277,
+        "status": "Completed"
+      },
+      {
+        "job_id": 14,
+        "employee": "darshan",
+        "document": "files.json",
+        "pages": 60,
+        "remaining_pages": 0.0,
+        "priority": 60,
+        "timestamp": 1776873897.6403675,
+        "started_at": 1776873898.4443226,
+        "completed_at": 1776873958.446949,
+        "status": "Completed"
+      },
+      {
+        "job_id": 16,
+        "employee": "darshan",
+        "document": "files.json",
+        "pages": 5,
+        "remaining_pages": 0.0,
+        "priority": 5,
+        "timestamp": 1776873931.1013288,
+        "started_at": 1776873958.449791,
+        "completed_at": 1776873963.4523273,
+        "status": "Completed"
+      },
+      {
+        "job_id": 17,
+        "employee": "darshan",
+        "document": "files.json",
+        "pages": 7,
+        "remaining_pages": 0.0,
+        "priority": 7,
+        "timestamp": 1776873940.3339648,
+        "started_at": 1776873963.4551163,
+        "completed_at": 1776873970.4582193,
+        "status": "Completed"
+      },
+      {
+        "job_id": 15,
+        "employee": "darshan",
+        "document": "files.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 10,
+        "timestamp": 1776873906.933888,
+        "started_at": 1776873970.4614217,
+        "completed_at": 1776873980.4641883,
+        "status": "Completed"
+      }
+    ],
+    "in_progress": null
+  },
+  "ljf": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 22,
+        "employee": "darshan",
+        "document": "file.txt",
+        "pages": 20,
+        "remaining_pages": 0,
+        "priority": -20,
+        "timestamp": 1776878217.3575547,
+        "started_at": 1776878217.3866212,
+        "completed_at": 1776878237.3891888,
+        "status": "Completed"
+      },
+      {
+        "job_id": 23,
+        "employee": "shekhar",
+        "document": "file.txt",
+        "pages": 20,
+        "remaining_pages": 0,
+        "priority": -20,
+        "timestamp": 1776878232.5241783,
+        "started_at": 1776878237.3918285,
+        "completed_at": 1776878257.3950686,
+        "status": "Completed"
+      },
+      {
+        "job_id": 24,
+        "employee": "file",
+        "document": "file",
+        "pages": 12,
+        "remaining_pages": 0,
+        "priority": -12,
+        "timestamp": 1776878242.2626622,
+        "started_at": 1776878257.3980155,
+        "completed_at": 1776878269.4006603,
+        "status": "Completed"
+      }
+    ],
+    "in_progress": null
+  },
+  "round_robin": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 4,
+        "employee": "darshan ",
+        "document": "app.py",
+        "pages": 20,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873338.317082,
+        "started_at": null,
+        "completed_at": null,
+        "status": "Completed"
+      },
+      {
+        "job_id": 5,
+        "employee": "darshan ",
+        "document": "windows.py",
+        "pages": 20,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873349.0716147,
+        "started_at": null,
+        "completed_at": null,
+        "status": "Completed"
+      },
+      {
+        "job_id": 6,
+        "employee": "darshan",
+        "document": "file.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873627.088883,
+        "started_at": 1776873635.4140127,
+        "completed_at": 1776873637.41708,
+        "status": "Completed"
+      },
+      {
+        "job_id": 7,
+        "employee": "darshan",
+        "document": "file.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873645.5083635,
+        "started_at": 1776873655.4424827,
+        "completed_at": 1776873657.44529,
+        "status": "Completed"
+      },
+      {
+        "job_id": 8,
+        "employee": "sandesh",
+        "document": "file.txt",
+        "pages": 10,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873655.6527238,
+        "started_at": 1776873665.4689422,
+        "completed_at": 1776873667.471552,
+        "status": "Completed"
+      },
+      {
+        "job_id": 9,
+        "employee": "sandesh",
+        "document": "file.txt",
+        "pages": 50,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873673.950184,
+        "started_at": 1776873763.7099018,
+        "completed_at": 1776873765.712948,
+        "status": "Completed"
+      },
+      {
+        "job_id": 10,
+        "employee": "dashan",
+        "document": "files.json",
+        "pages": 50,
+        "remaining_pages": 0.0,
+        "priority": 2,
+        "timestamp": 1776873684.8392324,
+        "started_at": 1776873773.736724,
+        "completed_at": 1776873775.7393417,
+        "status": "Completed"
+      }
+    ],
+    "in_progress": null,
+    "quantum_seconds": 2
+  }
+}
