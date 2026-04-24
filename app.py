@@ -293,6 +293,20 @@ def ljf_page():
 def rr_page():
     return render_template("roundrobin.html")
 
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "service": "queue-scheduler",
+        "queues": {
+            "fifo": len(fifo_queue),
+            "priority": len(priority_queue),
+            "sjf": len(sjf_queue),
+            "ljf": len(ljf_queue),
+            "round_robin": len(rr_queue)
+        }
+    }), 200
+
 # ---------------- API ROUTES ----------------
 @app.route("/add-fifo", methods=["POST"])
 def add_fifo():
