@@ -1,0 +1,35 @@
+{
+  "job_id": 2,
+  "fifo": {
+    "queue": [],
+    "completed": []
+  },
+  "priority": {
+    "queue": [],
+    "completed": [
+      {
+        "job_id": 1,
+        "emp": "jdsh",
+        "doc": "jfh",
+        "pages": 10.0,
+        "remaining": 10.0,
+        "priority": 1,
+        "timestamp": 1777049618.5335925,
+        "started_at": 1777049618.5460756,
+        "status": "Completed"
+      }
+    ]
+  },
+  "sjf": {
+    "queue": [],
+    "completed": []
+  },
+  "ljf": {
+    "queue": [],
+    "completed": []
+  },
+  "rr": {
+    "queue": [],
+    "completed": []
+  }
+}

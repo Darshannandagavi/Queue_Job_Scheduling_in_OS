@@ -531,11 +531,11 @@
         const progressPercent = Math.max(0, Math.min(100, parseInt(job.progress_percent || 0, 10)));
         let statusText = "";
         let statusClass = "";
-        if (job.status === "pending") {
-            statusText = "⏳ Pending";
+        if (job.status === "Queued") {
+            statusText = "⏳ Queued";
             statusClass = "status-pending";
-        } else if (job.status === "running") {
-            statusText = "🔄 Running (RR)";
+        } else if (job.status === "Printing") {
+            statusText = "🔄 Printing (RR)";
             statusClass = "status-running";
         } else {
             statusText = "✔️ Completed";

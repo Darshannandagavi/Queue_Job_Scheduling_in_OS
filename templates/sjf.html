@@ -506,8 +506,18 @@
     // generate row HTML with progress bar inside (stored without animation class, will add via diff)
     function buildRowHtml(job) {
         const progressPercent = Math.max(0, Math.min(100, parseInt(job.progress_percent || 0, 10)));
-        const statusText = job.status === "pending" ? "⏳ Pending" : "✔️ Completed";
-        const statusClass = job.status === "pending" ? "status-pending" : "status-completed";
+        let statusText = "";
+        let statusClass = "";
+        if (job.status === "Queued") {
+            statusText = "⏳ Queued";
+            statusClass = "status-pending";
+        } else if (job.status === "Printing") {
+            statusText = "🖨️ Printing";
+            statusClass = "status-pending";
+        } else {
+            statusText = "✔️ Completed";
+            statusClass = "status-completed";
+        }
         
         return `
             <tr data-job-id="${job.job_id}" data-status="${job.status}">
